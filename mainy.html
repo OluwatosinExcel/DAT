@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>90 Days Data Analytics Training - Oluwatosin Babalola</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #18181f;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --accent: #7c6aff;
+  --accent2: #a855f7;
+  --gold: #f0b429;
+  --gold2: #ffd166;
+  --text: #f0eff8;
+  --muted: #8b8aa0;
+  --muted2: #b5b3cc;
+  --green: #22c55e;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.7;overflow-x:hidden;}
+
+/* NOISE OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5;}
+
+/* GLOW BLOBS */
+.blob{position:fixed;border-radius:50%;filter:blur(120px);opacity:.12;pointer-events:none;z-index:0;}
+.blob-1{width:600px;height:600px;background:var(--accent);top:-200px;right:-100px;}
+.blob-2{width:500px;height:500px;background:var(--accent2);bottom:-100px;left:-150px;}
+.blob-3{width:300px;height:300px;background:var(--gold);top:50%;left:50%;transform:translate(-50%,-50%);}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(10,10,15,0.7);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:-0.02em;}
+.nav-logo span{color:var(--accent);}
+.nav-cta{background:var(--accent);color:#fff;padding:10px 22px;border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;transition:opacity .2s;}
+.nav-cta:hover{opacity:.85;}
+
+/* HERO */
+.hero{position:relative;z-index:1;padding:160px 5% 100px;max-width:900px;margin:0 auto;text-align:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,106,255,.15);border:1px solid rgba(124,106,255,.3);color:#a89fff;padding:6px 16px;border-radius:999px;font-size:13px;font-weight:500;margin-bottom:28px;}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.85);}}
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(36px,6vw,68px);line-height:1.05;letter-spacing:-0.03em;margin-bottom:24px;}
+h1 .grad{background:linear-gradient(135deg,var(--accent),var(--accent2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:18px;color:var(--muted2);max-width:600px;margin:0 auto 40px;line-height:1.7;font-weight:300;}
+.hero-stats{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-top:48px;padding-top:48px;border-top:1px solid var(--border);}
+.stat{text-align:center;}
+.stat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text);}
+.stat-label{font-size:13px;color:var(--muted);margin-top:2px;}
+
+/* INSTRUCTOR */
+.instructor{position:relative;z-index:1;max-width:860px;margin:0 auto 80px;padding:0 5%;}
+.instructor-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:36px;display:flex;gap:32px;align-items:flex-start;}
+.instructor-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:28px;font-weight:800;flex-shrink:0;}
+.instructor-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px;}
+.instructor-title{font-size:13px;color:var(--accent);font-weight:500;margin-bottom:12px;}
+.instructor-bio{font-size:14px;color:var(--muted2);line-height:1.75;}
+.instructor-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+.tag{background:rgba(255,255,255,.06);border:1px solid var(--border);padding:4px 12px;border-radius:999px;font-size:12px;color:var(--muted2);}
+
+/* PRICING */
+.pricing{position:relative;z-index:1;padding:80px 5%;max-width:860px;margin:0 auto;}
+.section-label{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-0.02em;margin-bottom:40px;}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.price-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;position:relative;transition:border-color .3s;}
+.price-card:hover{border-color:var(--border2);}
+.price-card.featured{border-color:var(--accent);background:linear-gradient(145deg,rgba(124,106,255,.08),var(--surface));}
+.price-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:5px 16px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;}
+.price-tier{font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:500;}
+.price-amount{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;letter-spacing:-0.03em;margin-bottom:4px;}
+.price-amount span{font-size:18px;font-weight:500;color:var(--muted);}
+.price-note{font-size:12px;color:var(--muted);margin-bottom:24px;}
+.price-features{list-style:none;margin-bottom:28px;}
+.price-features li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--muted2);padding:7px 0;border-bottom:1px solid var(--border);}
+.price-features li:last-child{border:none;}
+.check{color:var(--green);font-size:15px;flex-shrink:0;margin-top:2px;}
+.cross{color:var(--muted);font-size:15px;flex-shrink:0;margin-top:2px;}
+.enroll-btn{display:block;width:100%;text-align:center;padding:14px;border-radius:var(--radius-sm);font-size:15px;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.enroll-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;}
+.enroll-btn.primary:hover{opacity:.9;transform:translateY(-1px);}
+.enroll-btn.secondary{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.enroll-btn.secondary:hover{background:var(--surface2);}
+.price-expiry{font-size:12px;color:var(--muted);text-align:center;margin-top:12px;}
+
+/* WHAT YOU GET */
+.outcomes{position:relative;z-index:1;padding:80px 5%;max-width:860px;margin:0 auto;}
+.outcomes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.outcome-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;display:flex;align-items:flex-start;gap:14px;}
+.outcome-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.outcome-text{font-size:14px;color:var(--muted2);line-height:1.6;}
+.outcome-text strong{color:var(--text);display:block;margin-bottom:2px;font-size:14px;}
+
+/* MODULES */
+.modules{position:relative;z-index:1;padding:80px 5%;max-width:860px;margin:0 auto;}
+.free-badge{display:inline-block;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green);padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;margin-left:10px;vertical-align:middle;}
+.lock-badge{display:inline-block;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:999px;font-size:11px;margin-left:10px;vertical-align:middle;}
+.module-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;transition:border-color .3s;}
+.module-card:hover{border-color:var(--border2);}
+.module-header{padding:22px 28px;display:flex;align-items:center;gap:18px;cursor:pointer;user-select:none;}
+.module-num{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;flex-shrink:0;}
+.module-info{flex:1;}
+.module-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:3px;}
+.module-meta{font-size:13px;color:var(--muted);}
+.module-arrow{color:var(--muted);font-size:18px;transition:transform .3s;flex-shrink:0;}
+.module-arrow.open{transform:rotate(90deg);}
+.module-body{display:none;border-top:1px solid var(--border);}
+.module-body.open{display:block;}
+.module-desc{padding:20px 28px;font-size:14px;color:var(--muted2);line-height:1.75;border-bottom:1px solid var(--border);}
+.video-list{padding:0;}
+.video-item{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;}
+.video-item:last-child{border:none;}
+.video-num{font-size:12px;color:var(--muted);min-width:28px;font-weight:500;}
+.video-icon{font-size:14px;flex-shrink:0;}
+.video-title{font-size:14px;color:var(--muted2);flex:1;}
+.video-dur{font-size:12px;color:var(--muted);white-space:nowrap;}
+
+/* DEMO VIDEO */
+.demo-section{position:relative;z-index:1;padding:0 5% 80px;max-width:860px;margin:0 auto;}
+.demo-label{font-size:13px;color:var(--green);font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.demo-label::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green);}
+.demo-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:20px;}
+.video-embed{position:relative;padding-bottom:56.25%;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);}
+.video-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;}
+
+/* HOW IT WORKS */
+.how{position:relative;z-index:1;padding:80px 5%;max-width:860px;margin:0 auto;}
+.steps{display:grid;gap:0;}
+.step{display:flex;gap:24px;padding:28px 0;border-bottom:1px solid var(--border);}
+.step:last-child{border:none;}
+.step-num{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:rgba(124,106,255,.2);min-width:48px;line-height:1;}
+.step-content{}
+.step-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px;}
+.step-desc{font-size:14px;color:var(--muted2);line-height:1.7;}
+
+/* CONGRATS CARD PREVIEW */
+.congrats-preview{position:relative;z-index:1;padding:0 5% 80px;max-width:860px;margin:0 auto;}
+.congrats-card{background:linear-gradient(135deg,rgba(124,106,255,.15),rgba(168,85,247,.1));border:1px solid rgba(124,106,255,.3);border-radius:var(--radius);padding:40px;text-align:center;}
+.congrats-icon{font-size:48px;margin-bottom:16px;}
+.congrats-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:8px;}
+.congrats-text{font-size:14px;color:var(--muted2);max-width:480px;margin:0 auto 24px;}
+.share-btn{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid var(--border2);padding:10px 22px;border-radius:999px;font-size:14px;font-weight:500;cursor:pointer;color:var(--text);transition:background .2s;}
+.share-btn:hover{background:rgba(255,255,255,.14);}
+.congrats-badge{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1200;padding:6px 18px;border-radius:999px;font-size:13px;font-weight:700;margin-bottom:20px;}
+
+/* FAQ */
+.faq{position:relative;z-index:1;padding:80px 5%;max-width:860px;margin:0 auto;}
+.faq-item{border-bottom:1px solid var(--border);padding:20px 0;}
+.faq-q{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;}
+.faq-arrow{color:var(--muted);transition:transform .3s;font-size:18px;flex-shrink:0;}
+.faq-arrow.open{transform:rotate(45deg);}
+.faq-a{font-size:14px;color:var(--muted2);line-height:1.75;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;}
+.faq-a.open{max-height:300px;padding-top:14px;}
+
+/* FINAL CTA */
+.final-cta{position:relative;z-index:1;padding:100px 5%;text-align:center;max-width:700px;margin:0 auto;}
+.final-cta h2{font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;}
+.final-cta p{color:var(--muted2);margin-bottom:36px;font-size:17px;}
+
+/* FOOTER */
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:32px 5%;text-align:center;font-size:13px;color:var(--muted);}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .pricing-grid,.outcomes-grid{grid-template-columns:1fr;}
+  .instructor-card{flex-direction:column;}
+  .hero-stats{gap:20px;}
+  .module-header{padding:18px 20px;}
+  .module-desc,.video-item{padding-left:20px;padding-right:20px;}
+}
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Data<span>WithTosin</span></div>
+  <a href="https://selar.com/3731k6d312" target="_blank" class="nav-cta">Enroll Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    Enrolment Open - Limited Spots
+  </div>
+  <h1>
+    90 Days to Become a<br/>
+    <span class="grad">Data Analyst</span>
+  </h1>
+  <p class="hero-sub">A complete, practical data analytics training for Africans in the diaspora — starting from absolute zero. No degree. No prior tech experience. Just results.</p>
+  <a href="https://selar.com/3731k6d312" target="_blank" class="enroll-btn primary" style="display:inline-block;width:auto;padding:16px 40px;font-size:16px;border-radius:999px;">Start Your 90 Days — ₦50,000</a>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">56</div><div class="stat-label">Video lessons</div></div>
+    <div class="stat"><div class="stat-num">7</div><div class="stat-label">Modules</div></div>
+    <div class="stat"><div class="stat-num">90</div><div class="stat-label">Days structured</div></div>
+    <div class="stat"><div class="stat-num">7,300+</div><div class="stat-label">Views already</div></div>
+  </div>
+</section>
+
+<!-- INSTRUCTOR -->
+<section class="instructor">
+  <div class="instructor-card">
+    <div class="instructor-avatar">OB</div>
+    <div>
+      <div class="instructor-name">Oluwatosin Babalola</div>
+      <div class="instructor-title">Data Analyst · IT Project Manager · Tech Educator</div>
+      <div class="instructor-bio">I went from a confused polytechnic student with no direction to a 7-year professional in data analytics and IT project management. I spent years jumping between UI/UX, frontend dev, and software engineering before realising data was my path. Now I help Africans in the diaspora find theirs — faster, with less confusion, and with real tools they can use immediately.</div>
+      <div class="instructor-tags">
+        <span class="tag">7 years experience</span>
+        <span class="tag">TikTok 28k</span>
+        <span class="tag">YouTube 2.66k</span>
+        <span class="tag">Excel · SQL · Power BI · Tableau</span>
+        <span class="tag">AI & Prompt Engineering</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <div class="section-label">Investment</div>
+  <div class="section-title">Choose your path</div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tier">Self-Paced</div>
+      <div class="price-amount">₦35,000 <span>/year</span></div>
+      <div class="price-note">Full course access for 12 months</div>
+      <ul class="price-features">
+        <li><span class="check">✓</span> All 56 video lessons</li>
+        <li><span class="check">✓</span> 7 structured modules</li>
+        <li><span class="check">✓</span> Quizzes & reflection prompts</li>
+        <li><span class="check">✓</span> Module completion certificates</li>
+        <li><span class="check">✓</span> Portfolio project guidance</li>
+        <li><span class="cross">✕</span> WhatsApp community access</li>
+        <li><span class="cross">✕</span> Live Q&A sessions</li>
+      </ul>
+      <a href="https://selar.com/l4851j113d" target="_blank" class="enroll-btn secondary">Enroll — Self-Paced</a>
+      <div class="price-expiry">Access expires 12 months after payment</div>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">Most Popular</div>
+      <div class="price-tier">Self-Paced + Community</div>
+      <div class="price-amount">₦50,000 <span>/year</span></div>
+      <div class="price-note">Everything, plus live support</div>
+      <ul class="price-features">
+        <li><span class="check">✓</span> All 56 video lessons</li>
+        <li><span class="check">✓</span> 7 structured modules</li>
+        <li><span class="check">✓</span> Quizzes & reflection prompts</li>
+        <li><span class="check">✓</span> Module completion certificates</li>
+        <li><span class="check">✓</span> Portfolio project guidance</li>
+        <li><span class="check">✓</span> WhatsApp community access</li>
+        <li><span class="check">✓</span> Live Q&A sessions</li>
+      </ul>
+      <a href="https://selar.com/3731k6d312" target="_blank" class="enroll-btn primary">Enroll — Full Access</a>
+      <div class="price-expiry">Access expires 12 months after payment</div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES -->
+<section class="outcomes">
+  <div class="section-label">What you will achieve</div>
+  <div class="section-title">By Day 90, you will</div>
+  <div class="outcomes-grid">
+    <div class="outcome-item">
+      <div class="outcome-icon" style="background:rgba(124,106,255,.15);">📊</div>
+      <div class="outcome-text"><strong>Master 4 industry tools</strong>Excel, SQL, Tableau & Power BI — the exact stack employers want</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon" style="background:rgba(34,197,94,.12);">💼</div>
+      <div class="outcome-text"><strong>Build a real portfolio</strong>Finished projects you can show recruiters, not just certificates</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon" style="background:rgba(240,180,41,.12);">🤖</div>
+      <div class="outcome-text"><strong>Use AI in your workflow</strong>Prompt engineering and AI tools that make analysts 10× faster</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon" style="background:rgba(168,85,247,.12);">🌍</div>
+      <div class="outcome-text"><strong>Be remote-job ready</strong>Resume tips, GitHub profile, LinkedIn optimisation for global roles</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon" style="background:rgba(255,100,100,.12);">🧠</div>
+      <div class="outcome-text"><strong>Think like an analyst</strong>Understand business problems, ask the right questions, tell data stories</div>
+    </div>
+    <div class="outcome-item">
+      <div class="outcome-icon" style="background:rgba(34,197,94,.12);">🔗</div>
+      <div class="outcome-text"><strong>Join a support community</strong>Accountability, peer review, and direct access to Oluwatosin</div>
+    </div>
+  </div>
+</section>
+
+<!-- FREE PREVIEW VIDEO -->
+<section class="demo-section">
+  <div class="demo-label">Free preview — Module 1, Lesson 1</div>
+  <div class="demo-title">Watch before you commit — no sign-up needed</div>
+  <div class="video-embed">
+    <iframe src="https://www.youtube.com/embed/iQPCnPJapR0" title="What is Data & Data Analysis? Day 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section class="modules">
+  <div class="section-label">Curriculum</div>
+  <div class="section-title">7 modules. 56 lessons. 90 days.</div>
+  <p style="font-size:14px;color:var(--muted);margin-bottom:32px;">Each module unlocks after you pass the previous module quiz with 80% or above. First lesson of Module 1 is completely free — no payment needed.</p>
+
+  <!-- MODULE 1 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule('m1')">
+      <div class="module-num" style="background:rgba(124,106,255,.15);color:#a89fff;">01</div>
+      <div class="module-info">
+        <div class="module-title">Data Analytics Foundations <span class="free-badge">First lesson free</span></div>
+        <div class="module-meta">10 lessons · Days 1–10 · ~2 hours total</div>
+      </div>
+      <div class="module-arrow" id="arr-m1">▶</div>
+    </div>
+    <div class="module-body" id="m1">
+      <div class="module-desc">Start here. This module gives you the mindset, vocabulary, and conceptual foundation every data analyst needs — before touching any tool. By the end, you'll understand what data analysts actually do, what the job market looks like, and how to think about problems with data.</div>
+      <div class="video-list">
+        <div class="video-item"><span class="video-num">1.1</span><span class="video-icon">▶</span><span class="video-title">What is Data & Data Analysis? <span class="free-badge">Free</span></span><span class="video-dur">12:20</span></div>
+        <div class="video-item"><span class="video-num">1.2</span><span class="video-icon">🔒</span><span class="video-title">Career Paths in Data Analysis — Find Your Ideal Role</span><span class="video-dur">7:40</span></div>
+        <div class="video-item"><span class="video-num">1.3</span><span class="video-icon">🔒</span><span class="video-title">The Data Analysis Process — 6 Key Steps Every Analyst Must Know</span><span class="video-dur">18:52</span></div>
+        <div class="video-item"><span class="video-num">1.4</span><span class="video-icon">🔒</span><span class="video-title">Understanding Data Types — Categorical, Numerical, Boolean & More</span><span class="video-dur">10:43</span></div>
+        <div class="video-item"><span class="video-num">1.5</span><span class="video-icon">🔒</span><span class="video-title">Basic Statistics Every Analyst Should Know — Mean, Median, Mode, Std Dev</span><span class="video-dur">12:30</span></div>
+        <div class="video-item"><span class="video-num">1.6</span><span class="video-icon">🔒</span><span class="video-title">Understanding Business Problems — Ask the Right Questions Like a Pro</span><span class="video-dur">8:22</span></div>
+        <div class="video-item"><span class="video-num">1.7</span><span class="video-icon">🔒</span><span class="video-title">Mastering Data Cleaning — The Most Important Skill for Every Analyst</span><span class="video-dur">10:48</span></div>
+        <div class="video-item"><span class="video-num">1.8</span><span class="video-icon">🔒</span><span class="video-title">Data Ethics for Beginners — How to Handle Sensitive Information</span><span class="video-dur">10:08</span></div>
+        <div class="video-item"><span class="video-num">1.9</span><span class="video-icon">🔒</span><span class="video-title">Data Visualization Principles — Tell Powerful Data Stories</span><span class="video-dur">17:34</span></div>
+        <div class="video-item"><span class="video-num">1.10</span><span class="video-icon">🔒</span><span class="video-title">Exploring Data Sources — Primary vs Secondary Data</span><span class="video-dur">14:00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule('m2')">
+      <div class="module-num" style="background:rgba(34,197,94,.12);color:#4ade80;">02</div>
+      <div class="module-info">
+        <div class="module-title">Microsoft Excel Mastery <span class="lock-badge">🔒 Enrolled</span></div>
+        <div class="module-meta">15 lessons · Days 11–26 · ~5 hours total</div>
+      </div>
+      <div class="module-arrow" id="arr-m2">▶</div>
+    </div>
+    <div class="module-body" id="m2">
+      <div class="module-desc">Excel is still the most used tool in data analytics globally. This module takes you from the interface basics all the way to dashboards, macros, and a real-world supply chain optimization project. You'll leave here with a portfolio-ready Excel project.</div>
+      <div class="video-list">
+        <div class="video-item"><span class="video-num">2.1</span><span class="video-icon">🔒</span><span class="video-title">Introduction to Excel — Basic Functions & Interface</span><span class="video-dur">18:33</span></div>
+        <div class="video-item"><span class="video-num">2.2</span><span class="video-icon">🔒</span><span class="video-title">Excel Data Cleaning — Remove Duplicates, Find & Replace, Text to Column</span><span class="video-dur">17:58</span></div>
+        <div class="video-item"><span class="video-num">2.3</span><span class="video-icon">🔒</span><span class="video-title">Excel Shortcuts That Save Time</span><span class="video-dur">7:57</span></div>
+        <div class="video-item"><span class="video-num">2.4</span><span class="video-icon">🔒</span><span class="video-title">Pivot Table Basics — Summarize Data Fast</span><span class="video-dur">18:17</span></div>
+        <div class="video-item"><span class="video-num">2.5</span><span class="video-icon">🔒</span><span class="video-title">Charts & Dashboards in Excel Using Pivot Tables</span><span class="video-dur">24:34</span></div>
+        <div class="video-item"><span class="video-num">2.6</span><span class="video-icon">🔒</span><span class="video-title">VLOOKUP, HLOOKUP & XLOOKUP Explained</span><span class="video-dur">13:55</span></div>
+        <div class="video-item"><span class="video-num">2.7</span><span class="video-icon">🔒</span><span class="video-title">IF, COUNTIF & SUMIF Functions — Conditional Logic in Excel</span><span class="video-dur">11:32</span></div>
+        <div class="video-item"><span class="video-num">2.8</span><span class="video-icon">🔒</span><span class="video-title">Conditional Formatting for Better Data Visualization</span><span class="video-dur">9:30</span></div>
+        <div class="video-item"><span class="video-num">2.9</span><span class="video-icon">🔒</span><span class="video-title">Charts, Heatmaps & Cleaning Date Columns</span><span class="video-dur">19:34</span></div>
+        <div class="video-item"><span class="video-num">2.10</span><span class="video-icon">🔒</span><span class="video-title">Data Validation & Dynamic Dropdowns</span><span class="video-dur">17:13</span></div>
+        <div class="video-item"><span class="video-num">2.11</span><span class="video-icon">🔒</span><span class="video-title">Excel Date & Time Functions Made Easy</span><span class="video-dur">12:54</span></div>
+        <div class="video-item"><span class="video-num">2.12</span><span class="video-icon">🔒</span><span class="video-title">How to Use Macros in Excel — Automate Without Coding</span><span class="video-dur">10:45</span></div>
+        <div class="video-item"><span class="video-num">2.13</span><span class="video-icon">🔒</span><span class="video-title">Supply Chain Optimization Project Part 1</span><span class="video-dur">29:28</span></div>
+        <div class="video-item"><span class="video-num">2.14</span><span class="video-icon">🔒</span><span class="video-title">Supply Chain Dashboard — Visualizing Data for a Fashion Brand (Part 2)</span><span class="video-dur">32:37</span></div>
+        <div class="video-item"><span class="video-num">2.15</span><span class="video-icon">🔒</span><span class="video-title">Reporting for Supply Chain Optimization</span><span class="video-dur">9:50</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 3 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule('m3')">
+      <div class="module-num" style="background:rgba(240,180,41,.1);color:#fbbf24;">03</div>
+      <div class="module-info">
+        <div class="module-title">SQL for Data Analysis <span class="lock-badge">🔒 Enrolled</span></div>
+        <div class="module-meta">15 lessons · Days 27–41 · ~5 hours total</div>
+      </div>
+      <div class="module-arrow" id="arr-m3">▶</div>
+    </div>
+    <div class="module-body" id="m3">
+      <div class="module-desc">SQL is the language of data. Every data analyst uses it. This module takes you from installing SQL to writing complex queries with joins, window functions, CTEs — and a full healthcare data analysis project you can add to your portfolio.</div>
+      <div class="video-list">
+        <div class="video-item"><span class="video-num">3.1</span><span class="video-icon">🔒</span><span class="video-title">Introduction to SQL & Databases — Install & Understand SQL on Windows</span><span class="video-dur">7:29</span></div>
+        <div class="video-item"><span class="video-num">3.2</span><span class="video-icon">🔒</span><span class="video-title">SQL Tables — Create, Insert & View Data</span><span class="video-dur">12:26</span></div>
+        <div class="video-item"><span class="video-num">3.3</span><span class="video-icon">🔒</span><span class="video-title">SELECT, WHERE & ORDER BY Clauses</span><span class="video-dur">13:05</span></div>
+        <div class="video-item"><span class="video-num">3.4</span><span class="video-icon">🔒</span><span class="video-title">Primary Key vs Foreign Key + Importing Data into SQL</span><span class="video-dur">11:23</span></div>
+        <div class="video-item"><span class="video-num">3.5</span><span class="video-icon">🔒</span><span class="video-title">SQL Aggregation Functions with Real Healthcare Data</span><span class="video-dur">16:14</span></div>
+        <div class="video-item"><span class="video-num">3.6</span><span class="video-icon">🔒</span><span class="video-title">GROUP BY vs HAVING vs WHERE Explained</span><span class="video-dur">9:55</span></div>
+        <div class="video-item"><span class="video-num">3.7</span><span class="video-icon">🔒</span><span class="video-title">SQL JOINS — INNER, LEFT, RIGHT, FULL OUTER with Examples</span><span class="video-dur">20:09</span></div>
+        <div class="video-item"><span class="video-num">3.8</span><span class="video-icon">🔒</span><span class="video-title">SQL DDL vs DML vs DCL with Real-Life Examples</span><span class="video-dur">16:53</span></div>
+        <div class="video-item"><span class="video-num">3.9</span><span class="video-icon">🔒</span><span class="video-title">CASE Statement & Nested CASE in SQL</span><span class="video-dur">17:46</span></div>
+        <div class="video-item"><span class="video-num">3.10</span><span class="video-icon">🔒</span><span class="video-title">Mastering Subqueries in SQL</span><span class="video-dur">13:16</span></div>
+        <div class="video-item"><span class="video-num">3.11</span><span class="video-icon">🔒</span><span class="video-title">CTEs vs Temporary Tables — Simplifying Complex Queries</span><span class="video-dur">14:38</span></div>
+        <div class="video-item"><span class="video-num">3.12</span><span class="video-icon">🔒</span><span class="video-title">PARTITION BY & Window Functions — RANK, DENSE_RANK, ROW_NUMBER</span><span class="video-dur">13:05</span></div>
+        <div class="video-item"><span class="video-num">3.13</span><span class="video-icon">🔒</span><span class="video-title">Healthcare Data Project — Exploration, Preparation & Cleaning (Part 1)</span><span class="video-dur">31:28</span></div>
+        <div class="video-item"><span class="video-num">3.14</span><span class="video-icon">🔒</span><span class="video-title">Healthcare Data Project — Full Analysis (Part 2)</span><span class="video-dur">21:08</span></div>
+        <div class="video-item"><span class="video-num">3.15</span><span class="video-icon">🔒</span><span class="video-title">Advanced: How to Clean Data in Excel Before SQL Import</span><span class="video-dur">12:31</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 4 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule('m4')">
+      <div class="module-num" style="background:rgba(168,85,247,.12);color:#c084fc;">04</div>
+      <div class="module-info">
+        <div class="module-title">Data Visualization with Tableau <span class="lock-badge">🔒 Enrolled</span></div>
+        <div class="module-meta">4 lessons · Days 42–45 · ~2.5 hours total</div>
+      </div>
+      <div class="module-arrow" id="arr-m4">▶</div>
+    </div>
+    <div class="module-body" id="m4">
+      <div class="module-desc">Tableau turns data into stories. This module walks you through the full Tableau environment and takes you straight into a real healthcare visualization project — and a customer retention analysis using Tableau, Python, Canva and PowerPoint together.</div>
+      <div class="video-list">
+        <div class="video-item"><span class="video-num">4.1</span><span class="video-icon">🔒</span><span class="video-title">How to Install Tableau Public (Free Version)</span><span class="video-dur">2:17</span></div>
+        <div class="video-item"><span class="video-num">4.2</span><span class="video-icon">🔒</span><span class="video-title">Introduction to Tableau — Data Pane, Shelves, Canvas, Marks</span><span class="video-dur">32:54</span></div>
+        <div class="video-item"><span class="video-num">4.3</span><span class="video-icon">🔒</span><span class="video-title">Healthcare Data Visualization in Tableau</span><span class="video-dur">32:49</span></div>
+        <div class="video-item"><span class="video-num">4.4</span><span class="video-icon">🔒</span><span class="video-title">Real-World Customer Retention Analysis — Python, PowerPoint, Tableau & Canva</span><span class="video-dur">1:00:59</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 5 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule('m5')">
+      <div class="module-num" style="background:rgba(59,130,246,.12);color:#60a5fa;">05</div>
+      <div class="module-info">
+        <div class="module-title">Power BI & Business Intelligence <span class="lock-badge">🔒 Enrolled</span></div>
+        <div class="module-meta">3 lessons · Days 46–48 · ~1.5 hours total</div>
+      </div>
+      <div class="module-arrow" id="arr-m5">▶</div>
+    </div>
+    <div class="module-body" id="m5">
+      <div class="module-desc">Power BI is the top business intelligence tool in corporate Africa and globally. You'll build your first visualization, then complete a full HR data analytics dashboard — a project type that's extremely popular with employers.</div>
+      <div class="video-list">
+        <div class="video-item"><span class="video-num">5.1</span><span class="video-icon">🔒</span><span class="video-title">Introduction to Power BI — Creating Your First Visualization</span><span class="video-dur">41:58</span></div>
+        <div class="video-item"><span class="video-num">5.2</span><span class="video-icon">🔒</span><span class="video-title">HR Data Analytics in Power BI (Continuation)</span><span class="video-dur">27:37</span></div>
+        <div class="video-item"><span class="video-num">5.3</span><span class="video-icon">🔒</span><span class="video-title">HR Power BI Dashboard Creation</span><span class="video-dur">21:21</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 6 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule('m6')">
+      <div class="module-num" style="background:rgba(34,197,94,.1);color:#4ade80;">06</div>
+      <div class="module-info">
+        <div class="module-title">Portfolio, GitHub & Career Readiness <span class="lock-badge">🔒 Enrolled</span></div>
+        <div class="module-meta">6 lessons · ~2 hours total</div>
+      </div>
+      <div class="module-arrow" id="arr-m6">▶</div>
+    </div>
+    <div class="module-body" id="m6">
+      <div class="module-desc">Having skills is one thing. Getting hired is another. This module is about making sure employers can find you, understand your value, and want to hire you. You'll set up your GitHub, build a portfolio website, and learn to tell stories with data the way hiring managers want to hear them.</div>
+      <div class="video-list">
+        <div class="video-item"><span class="video-num">6.1</span><span class="video-icon">🔒</span><span class="video-title">How to Set Up Your GitHub Profile & Upload Your Project</span><span class="video-dur">8:04</span></div>
+        <div class="video-item"><span class="video-num">6.2</span><span class="video-icon">🔒</span><span class="video-title">How to Create a Stunning GitHub Profile That Stands Out (2025)</span><span class="video-dur">9:30</span></div>
+        <div class="video-item"><span class="video-num">6.3</span><span class="video-icon">🔒</span><span class="video-title">Portfolio Website + GitHub Repository Setup & Hosting — Full Guide</span><span class="video-dur">59:51</span></div>
+        <div class="video-item"><span class="video-num">6.4</span><span class="video-icon">🔒</span><span class="video-title">Storytelling with Data — Make Your Data Speak & Get Hired</span><span class="video-dur">5:15</span></div>
+        <div class="video-item"><span class="video-num">6.5</span><span class="video-icon">🔒</span><span class="video-title">No Stakeholder? No Problem — Dataset to Business Insight</span><span class="video-dur">4:26</span></div>
+        <div class="video-item"><span class="video-num">6.6</span><span class="video-icon">🔒</span><span class="video-title">Why You're NOT Landing Remote Jobs in 2025 (And How to Fix It)</span><span class="video-dur">8:50</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 7 -->
+  <div class="module-card" style="border-color:rgba(240,180,41,.25);">
+    <div class="module-header" onclick="toggleModule('m7')">
+      <div class="module-num" style="background:rgba(240,180,41,.15);color:#f0b429;">07</div>
+      <div class="module-info">
+        <div class="module-title">AI Tools in Data Analysis <span style="display:inline-block;background:rgba(240,180,41,.15);border:1px solid rgba(240,180,41,.3);color:#f0b429;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;margin-left:10px;vertical-align:middle;">Coming at launch</span></div>
+        <div class="module-meta">New lessons · AI + Prompt Engineering for Data Analysts</div>
+      </div>
+      <div class="module-arrow" id="arr-m7">▶</div>
+    </div>
+    <div class="module-body" id="m7">
+      <div class="module-desc">The future of data analytics is AI-assisted. This module shows you how to use ChatGPT, Copilot, and other AI tools directly inside your data workflow — writing SQL faster, cleaning data smarter, and communicating insights more effectively using prompt engineering.</div>
+      <div class="video-list">
+        <div class="video-item"><span class="video-num">7.1</span><span class="video-icon">🔒</span><span class="video-title">AI Tools Every Data Analyst Should Know in 2025</span><span class="video-dur">Coming soon</span></div>
+        <div class="video-item"><span class="video-num">7.2</span><span class="video-icon">🔒</span><span class="video-title">Prompt Engineering for Data Analysis — A Practical Guide</span><span class="video-dur">Coming soon</span></div>
+        <div class="video-item"><span class="video-num">7.3</span><span class="video-icon">🔒</span><span class="video-title">Using ChatGPT & Copilot to Speed Up Your SQL & Excel Work</span><span class="video-dur">Coming soon</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="section-label">The process</div>
+  <div class="section-title">How the course works</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Pay on Selar — get instant access</div>
+        <div class="step-desc">Complete payment on Selar. Your login credentials are automatically sent to your email within minutes. Your 12-month access clock starts from that moment.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Log in and start Module 1</div>
+        <div class="step-desc">Your dashboard unlocks Module 1 immediately. Watch the lessons, complete the reflection prompts, and post your discussion question in the WhatsApp community.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Pass the module quiz to unlock the next</div>
+        <div class="step-desc">After each module, you take a short quiz. Score 80% or above to unlock the next module. This keeps you accountable and ensures you're actually learning — not just watching.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-title">Earn your module badge — share it publicly</div>
+        <div class="step-desc">Every completed module generates a shareable completion card. Post it on LinkedIn, Twitter, or Instagram to build your professional presence and attract recruiters while you're still learning.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <div class="step-title">Graduate with a portfolio & certificate</div>
+        <div class="step-desc">By Day 90, you'll have real projects on GitHub, a portfolio website live online, and a final course certificate — everything a recruiter needs to take you seriously.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONGRATS CARD PREVIEW -->
+<section class="congrats-preview">
+  <div class="section-label">After every module</div>
+  <div class="section-title">Your shareable completion card</div>
+  <div class="congrats-card">
+    <div class="congrats-icon">🏆</div>
+    <div class="congrats-badge">Module 2 Complete</div>
+    <div class="congrats-title">Excel Mastery Unlocked!</div>
+    <div class="congrats-text">You just completed the Microsoft Excel module of the 90 Days Data Analytics Training by Oluwatosin Babalola. Share this milestone — recruiters are watching.</div>
+    <button class="share-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+      Share to LinkedIn
+    </button>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="section-label">Questions</div>
+  <div class="section-title">Frequently asked</div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq('f1')">Do I need any prior experience or a degree? <span class="faq-arrow" id="farr-f1">+</span></div>
+    <div class="faq-a" id="f1">Absolutely not. This course was designed for complete beginners. If you've ever used a phone or a laptop, you have enough to start. Oluwatosin built this course specifically for people who felt lost in tech — because she was one of them.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq('f2')">How long do I have access after payment? <span class="faq-arrow" id="farr-f2">+</span></div>
+    <div class="faq-a" id="f2">You have 12 months of full access from the date of payment. Your login will remain active for that period. After 12 months, access expires — so make sure to complete the course and download any resources within that window.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq('f3')">What if I fail the module quiz? <span class="faq-arrow" id="farr-f3">+</span></div>
+    <div class="faq-a" id="f3">No problem — you can retake the quiz as many times as you need. The 80% pass mark is there to keep you honest and ensure you're really absorbing the material, not to block you. Review the lesson, retake the quiz, and move forward.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq('f4')">Will I get a certificate at the end? <span class="faq-arrow" id="farr-f4">+</span></div>
+    <div class="faq-a" id="f4">Yes. You'll receive a final course completion certificate that you can add to your LinkedIn profile and CV. You'll also earn a shareable digital badge after every module — so you can show progress publicly before you even finish.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq('f5')">What tools will I need and are they free? <span class="faq-arrow" id="farr-f5">+</span></div>
+    <div class="faq-a" id="f5">Most tools used in this course have free versions. Microsoft Excel (or Google Sheets as an alternative), SQL Server Express (free), Tableau Public (free), and Power BI Desktop (free). You won't need to buy any paid software to complete the course.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq('f6')">Is the WhatsApp community included in both plans? <span class="faq-arrow" id="farr-f6">+</span></div>
+    <div class="faq-a" id="f6">The WhatsApp community is included in the Self-Paced + Community plan (₦50,000) only. The self-paced plan (₦35,000) gives you full course access but without the community and live Q&A sessions.</div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <h2>Your data career starts<br/><span style="background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">today, not someday</span></h2>
+  <p>Join a growing community of Africans in the diaspora who stopped waiting and started building the career they want — with data.</p>
+  <a href="https://selar.com/3731k6d312" target="_blank" class="enroll-btn primary" style="display:inline-block;width:auto;padding:18px 48px;font-size:16px;border-radius:999px;margin-bottom:16px;">Enroll Now — ₦50,000</a>
+  <div style="font-size:13px;color:var(--muted);">12 months access · All 56 lessons · WhatsApp community · Module certificates</div>
+</section>
+
+<footer>
+  <div style="margin-bottom:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;">DataWithTosin</div>
+  <div>© 2025 Oluwatosin Babalola · All rights reserved</div>
+  <div style="margin-top:8px;font-size:12px;">Questions? Reach out via <a href="https://wa.me/2347070094167" style="color:var(--accent);text-decoration:none;">WhatsApp</a></div>
+</footer>
+
+<script>
+function toggleModule(id){
+  const body=document.getElementById(id);
+  const arr=document.getElementById('arr-'+id);
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  arr.classList.toggle('open',!open);
+}
+function toggleFaq(id){
+  const ans=document.getElementById(id);
+  const arr=document.getElementById('farr-'+id);
+  const open=ans.classList.contains('open');
+  ans.classList.toggle('open',!open);
+  arr.classList.toggle('open',!open);
+}
+toggleModule('m1');
+</script>
+</body>
+</html>
