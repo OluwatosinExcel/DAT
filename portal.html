@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Portal — DataWithTosin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:#111118;--surface2:#18181f;--surface3:#1e1e28;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --accent:#7c6aff;--accent2:#a855f7;--gold:#f0b429;--gold2:#ffd166;
+  --text:#f0eff8;--muted:#8b8aa0;--muted2:#b5b3cc;
+  --green:#22c55e;--green-bg:rgba(34,197,94,.1);--green-border:rgba(34,197,94,.25);
+  --red:#f87171;--red-bg:rgba(248,113,113,.1);
+  --radius:14px;--radius-sm:9px;--sidebar:260px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden;}
+button,input,textarea{font-family:'DM Sans',sans-serif;}
+
+/* ── LAYOUT ── */
+.app{display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:50;transition:transform .3s;}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.02em;}
+.logo-text span{color:var(--accent);}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.sidebar-student{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.student-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex-shrink:0;}
+.student-name{font-size:13px;font-weight:500;color:var(--text);}
+.student-plan{font-size:11px;color:var(--accent);margin-top:1px;}
+.sidebar-nav{padding:12px 0;flex:1;}
+.nav-section{padding:8px 20px 4px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;font-size:13px;color:var(--muted2);border-left:2px solid transparent;transition:all .2s;}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04);}
+.nav-item.active{color:var(--text);border-left-color:var(--accent);background:rgba(124,106,255,.08);}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7;}
+.nav-item.active svg{opacity:1;}
+.module-nav{padding:0 12px;}
+.mod-nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);font-size:12px;color:var(--muted);cursor:pointer;transition:all .2s;margin-bottom:1px;}
+.mod-nav-item:hover{color:var(--muted2);background:rgba(255,255,255,.04);}
+.mod-nav-item.active{color:var(--text);background:rgba(124,106,255,.1);}
+.mod-nav-item.locked{opacity:.4;cursor:not-allowed;}
+.mod-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.mod-dot.done{background:var(--green);}
+.mod-dot.active{background:var(--accent);}
+.mod-dot.locked{background:var(--muted);opacity:.4;}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);}
+.expiry-bar{background:var(--surface2);border-radius:999px;height:4px;margin-top:6px;}
+.expiry-fill{background:linear-gradient(90deg,var(--accent),var(--accent2));height:100%;border-radius:999px;width:72%;}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);flex:1;min-height:100vh;}
+
+/* ── TOP BAR ── */
+.topbar{padding:16px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,15,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:40;}
+.topbar-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.topbar-actions{display:flex;align-items:center;gap:10px;}
+.btn-sm{padding:7px 16px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .2s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{opacity:.88;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted2);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);}
+
+/* ── SCREENS ── */
+.screen{display:none;padding:32px;}
+.screen.active{display:block;}
+
+/* ── DASHBOARD ── */
+.dash-greeting{margin-bottom:32px;}
+.dash-greeting h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;}
+.dash-greeting p{font-size:14px;color:var(--muted2);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.stat-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.02em;}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.dash-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;}
+.card-title a{font-size:12px;color:var(--accent);text-decoration:none;font-family:'DM Sans',sans-serif;font-weight:400;}
+
+/* progress bars */
+.module-progress{margin-bottom:14px;}
+.mp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.mp-name{font-size:13px;color:var(--muted2);}
+.mp-pct{font-size:12px;color:var(--muted);}
+.mp-bar{background:var(--surface2);border-radius:999px;height:5px;}
+.mp-fill{height:100%;border-radius:999px;transition:width .6s ease;}
+
+/* leaderboard */
+.lb-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.lb-item:last-child{border:none;}
+.lb-rank{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);min-width:20px;}
+.lb-rank.gold{color:var(--gold);}
+.lb-rank.silver{color:#94a3b8;}
+.lb-rank.bronze{color:#b45309;}
+.lb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.lb-name{font-size:13px;color:var(--text);flex:1;}
+.lb-score{font-size:12px;color:var(--muted);}
+.lb-badge{font-size:10px;background:rgba(124,106,255,.15);color:#a89fff;padding:2px 8px;border-radius:999px;border:1px solid rgba(124,106,255,.25);}
+
+/* certs */
+.cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.cert-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;}
+.cert-icon{font-size:24px;margin-bottom:6px;}
+.cert-name{font-size:12px;color:var(--muted2);font-weight:500;}
+.cert-date{font-size:11px;color:var(--muted);margin-top:2px;}
+.cert-locked{opacity:.35;}
+.share-pill{display:inline-block;margin-top:8px;font-size:10px;background:rgba(34,197,94,.12);color:var(--green);padding:2px 8px;border-radius:999px;border:1px solid var(--green-border);cursor:pointer;}
+
+/* next lesson CTA */
+.next-lesson{background:linear-gradient(135deg,rgba(124,106,255,.12),rgba(168,85,247,.08));border:1px solid rgba(124,106,255,.25);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:20px;cursor:pointer;transition:border-color .2s;}
+.next-lesson:hover{border-color:rgba(124,106,255,.5);}
+.nl-icon{width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nl-label{font-size:11px;color:var(--accent);font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.nl-title{font-size:14px;font-weight:500;color:var(--text);}
+.nl-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.nl-arrow{margin-left:auto;color:var(--muted);font-size:20px;}
+
+/* ── LESSON SCREEN ── */
+.lesson-layout{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;}
+.video-wrap{background:#000;border-radius:var(--radius);overflow:hidden;position:relative;padding-bottom:56.25%;}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.lesson-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin:20px 0 8px;letter-spacing:-.02em;}
+.lesson-meta{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted);margin-bottom:20px;flex-wrap:wrap;}
+.lesson-meta span{display:flex;align-items:center;gap:4px;}
+.lesson-desc{font-size:14px;color:var(--muted2);line-height:1.75;margin-bottom:28px;}
+
+/* Q&A section */
+.qa-section{margin-top:8px;}
+.qa-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+.qa-header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.qa-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.qa-type{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
+.qa-body{padding:20px;}
+
+/* quiz */
+.quiz-q{font-size:14px;color:var(--text);margin-bottom:14px;font-weight:500;line-height:1.6;}
+.quiz-options{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.quiz-opt{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;font-size:13px;color:var(--muted2);transition:all .2s;}
+.quiz-opt:hover{border-color:var(--border2);color:var(--text);}
+.quiz-opt.selected{border-color:var(--accent);color:var(--text);background:rgba(124,106,255,.08);}
+.quiz-opt.correct{border-color:var(--green);color:var(--green);background:var(--green-bg);}
+.quiz-opt.wrong{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+.quiz-opt-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.quiz-opt-dot.filled::after{content:'';width:8px;height:8px;border-radius:50%;background:currentColor;}
+.quiz-submit{background:var(--accent);color:#fff;border:none;padding:10px 24px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.quiz-submit:hover{opacity:.88;}
+.quiz-submit:disabled{opacity:.4;cursor:not-allowed;}
+.quiz-result{padding:12px 14px;border-radius:var(--radius-sm);font-size:13px;margin-top:12px;display:none;}
+.quiz-result.show{display:block;}
+.quiz-result.pass{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);}
+.quiz-result.fail{background:var(--red-bg);border:1px solid rgba(248,113,113,.25);color:var(--red);}
+
+/* reflection */
+.reflection-q{font-size:14px;color:var(--text);margin-bottom:12px;font-weight:500;line-height:1.6;}
+.reflection-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-size:13px;resize:vertical;min-height:90px;outline:none;transition:border-color .2s;line-height:1.65;}
+.reflection-textarea:focus{border-color:var(--accent);}
+.reflection-save{margin-top:10px;background:transparent;border:1px solid var(--border2);color:var(--muted2);padding:8px 18px;border-radius:999px;font-size:13px;cursor:pointer;transition:all .2s;}
+.reflection-save:hover{background:var(--surface2);color:var(--text);}
+.reflection-save.saved{color:var(--green);border-color:var(--green-border);}
+
+/* whatsapp prompt */
+.wa-prompt{display:flex;flex-direction:column;gap:12px;}
+.wa-question{background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px;font-size:14px;color:var(--text);border-left:3px solid var(--accent);line-height:1.65;}
+.wa-btn{display:inline-flex;align-items:center;gap:8px;background:#25d366;color:#fff;border:none;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity .2s;}
+.wa-btn:hover{opacity:.88;}
+.wa-note{font-size:12px;color:var(--muted);line-height:1.6;}
+
+/* lesson sidebar */
+.lesson-sidebar{position:sticky;top:80px;}
+.lesson-list{max-height:70vh;overflow-y:auto;}
+.lesson-list::-webkit-scrollbar{width:3px;}
+.lesson-list::-webkit-scrollbar-track{background:transparent;}
+.lesson-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.lesson-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;margin-bottom:1px;}
+.lesson-item:hover{background:var(--surface2);}
+.lesson-item.active{background:rgba(124,106,255,.1);border:1px solid rgba(124,106,255,.2);}
+.lesson-item.locked{opacity:.38;cursor:not-allowed;}
+.li-num{font-size:11px;color:var(--muted);min-width:24px;}
+.li-title{font-size:12px;color:var(--muted2);flex:1;line-height:1.45;}
+.lesson-item.active .li-title{color:var(--text);}
+.li-dur{font-size:11px;color:var(--muted);white-space:nowrap;}
+.li-check{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.li-check.done{background:var(--green);border-color:var(--green);}
+
+/* module header in lesson list */
+.mod-header-row{padding:10px 14px 4px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+
+/* progress ring */
+.progress-ring-wrap{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:8px 0 16px;}
+.ring-label{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-top:10px;}
+.ring-sub{font-size:12px;color:var(--muted);}
+
+/* module complete banner */
+.module-complete{background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.06));border:1px solid var(--green-border);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:16px;}
+.mc-icon{font-size:32px;margin-bottom:8px;}
+.mc-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--green);margin-bottom:4px;}
+.mc-text{font-size:13px;color:var(--muted2);margin-bottom:14px;}
+.share-btn{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:#fff;border:none;padding:9px 20px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;}
+
+/* mobile menu toggle */
+.menu-toggle{display:none;background:transparent;border:none;color:var(--text);cursor:pointer;padding:4px;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.open{display:block;}
+  .main{margin-left:0;}
+  .menu-toggle{display:block;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .dash-grid{grid-template-columns:1fr;}
+  .lesson-layout{grid-template-columns:1fr;}
+  .cert-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:540px){
+  .screen{padding:20px 16px;}
+  .topbar{padding:14px 16px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .stat-value{font-size:22px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">DataWith<span>Tosin</span></div>
+    <div class="logo-sub">Student Portal</div>
+  </div>
+  <div class="sidebar-student">
+    <div class="student-avatar">AB</div>
+    <div>
+      <div class="student-name">Adaeze Bright</div>
+      <div class="student-plan">Full Access + Community</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Menu</div>
+    <div class="nav-item active" onclick="showScreen('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showScreen('lesson')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Continue Learning
+    </div>
+    <div class="nav-item" onclick="showScreen('certs')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      My Certificates
+    </div>
+    <div class="nav-item" onclick="showScreen('leaderboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Leaderboard
+    </div>
+
+    <div class="nav-section" style="margin-top:8px;">Course Modules</div>
+    <div class="module-nav">
+      <div class="mod-nav-item active" onclick="showScreen('lesson')">
+        <div class="mod-dot active"></div> M1 · Foundations
+      </div>
+      <div class="mod-nav-item" onclick="showScreen('lesson')">
+        <div class="mod-dot locked"></div> M2 · Excel
+      </div>
+      <div class="mod-nav-item locked">
+        <div class="mod-dot locked"></div> M3 · SQL
+      </div>
+      <div class="mod-nav-item locked">
+        <div class="mod-dot locked"></div> M4 · Tableau
+      </div>
+      <div class="mod-nav-item locked">
+        <div class="mod-dot locked"></div> M5 · Power BI
+      </div>
+      <div class="mod-nav-item locked">
+        <div class="mod-dot locked"></div> M6 · Career
+      </div>
+      <div class="mod-nav-item locked">
+        <div class="mod-dot locked"></div> M7 · AI Tools
+      </div>
+    </div>
+
+    <div class="nav-section" style="margin-top:8px;">Community</div>
+    <div class="nav-item" onclick="window.open('https://wa.me/','_blank')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.555 4.122 1.524 5.855L.057 23.944l6.244-1.441A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.886 0-3.655-.493-5.19-1.357l-.371-.213-3.708.856.883-3.601-.234-.381A9.943 9.943 0 012 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+      WhatsApp Community
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Access expires in 287 days</div>
+    <div class="expiry-bar"><div class="expiry-fill"></div></div>
+    <div style="margin-top:14px;font-size:12px;color:var(--muted);">Enrolled: 17 Apr 2025</div>
+  </div>
+</aside>
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-sm btn-ghost" onclick="showScreen('lesson')">Continue Learning</button>
+      <button class="btn-sm btn-primary" onclick="window.open('https://wa.me/','_blank')">Join Community</button>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD SCREEN ══ -->
+  <div class="screen active" id="screen-dashboard">
+    <div class="dash-greeting">
+      <h2>Welcome back, Adaeze 👋</h2>
+      <p>You're on Day 3 of 90. Keep going — consistency beats speed.</p>
+    </div>
+
+    <!-- next lesson CTA -->
+    <div class="next-lesson" onclick="showScreen('lesson')">
+      <div class="nl-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <div>
+        <div class="nl-label">Up next</div>
+        <div class="nl-title">1.3 — The Data Analysis Process: 6 Key Steps</div>
+        <div class="nl-meta">Module 1 · Lesson 3 · 18 min</div>
+      </div>
+      <div class="nl-arrow">›</div>
+    </div>
+
+    <!-- stat cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Overall progress</div>
+        <div class="stat-value" style="color:var(--accent);">18%</div>
+        <div class="stat-sub">10 of 56 lessons done</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Quiz average</div>
+        <div class="stat-value" style="color:var(--green);">86%</div>
+        <div class="stat-sub">Across 2 quizzes taken</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Certificates</div>
+        <div class="stat-value" style="color:var(--gold);">1</div>
+        <div class="stat-sub">Module 1 complete</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Leaderboard rank</div>
+        <div class="stat-value">#4</div>
+        <div class="stat-sub">Out of 38 students</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <!-- module progress -->
+      <div>
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">Module progress <a href="#" onclick="showScreen('lesson')">View all →</a></div>
+          <div class="module-progress">
+            <div class="mp-header"><span class="mp-name">M1 · Foundations</span><span class="mp-pct" style="color:var(--green);">100%</span></div>
+            <div class="mp-bar"><div class="mp-fill" style="width:100%;background:var(--green);"></div></div>
+          </div>
+          <div class="module-progress">
+            <div class="mp-header"><span class="mp-name">M2 · Excel Mastery</span><span class="mp-pct">20%</span></div>
+            <div class="mp-bar"><div class="mp-fill" style="width:20%;background:var(--accent);"></div></div>
+          </div>
+          <div class="module-progress">
+            <div class="mp-header"><span class="mp-name">M3 · SQL</span><span class="mp-pct">0%</span></div>
+            <div class="mp-bar"><div class="mp-fill" style="width:0%;background:var(--muted);"></div></div>
+          </div>
+          <div class="module-progress">
+            <div class="mp-header"><span class="mp-name">M4 · Tableau</span><span class="mp-pct">0%</span></div>
+            <div class="mp-bar"><div class="mp-fill" style="width:0%;background:var(--muted);"></div></div>
+          </div>
+          <div class="module-progress">
+            <div class="mp-header"><span class="mp-name">M5 · Power BI</span><span class="mp-pct">0%</span></div>
+            <div class="mp-bar"><div class="mp-fill" style="width:0%;background:var(--muted);"></div></div>
+          </div>
+          <div class="module-progress">
+            <div class="mp-header"><span class="mp-name">M6 · Career Readiness</span><span class="mp-pct">0%</span></div>
+            <div class="mp-bar"><div class="mp-fill" style="width:0%;background:var(--muted);"></div></div>
+          </div>
+          <div class="module-progress" style="margin-bottom:0;">
+            <div class="mp-header"><span class="mp-name">M7 · AI Tools</span><span class="mp-pct" style="color:var(--gold);">Coming soon</span></div>
+            <div class="mp-bar"><div class="mp-fill" style="width:0%;background:var(--gold);"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- right column -->
+      <div>
+        <!-- leaderboard -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">Leaderboard <a href="#" onclick="showScreen('leaderboard')">Full board →</a></div>
+          <div class="lb-item">
+            <div class="lb-rank gold">1</div>
+            <div class="lb-avatar" style="background:rgba(240,180,41,.15);color:var(--gold);font-size:11px;">CK</div>
+            <div class="lb-name">Chisom K.</div>
+            <div class="lb-score">52 pts</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank silver">2</div>
+            <div class="lb-avatar" style="background:rgba(148,163,184,.12);color:#94a3b8;">TO</div>
+            <div class="lb-name">Tunde O.</div>
+            <div class="lb-score">47 pts</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank bronze">3</div>
+            <div class="lb-avatar" style="background:rgba(180,83,9,.12);color:#b45309;">FM</div>
+            <div class="lb-name">Fatima M.</div>
+            <div class="lb-score">43 pts</div>
+          </div>
+          <div class="lb-item" style="background:rgba(124,106,255,.06);border-radius:var(--radius-sm);padding:10px 8px;border-bottom:none;">
+            <div class="lb-rank" style="color:var(--accent);">4</div>
+            <div class="lb-avatar" style="background:rgba(124,106,255,.15);color:var(--accent);">AB</div>
+            <div class="lb-name" style="color:var(--accent);">You</div>
+            <div class="lb-badge">You</div>
+            <div class="lb-score" style="color:var(--accent);">38 pts</div>
+          </div>
+        </div>
+
+        <!-- certs -->
+        <div class="card">
+          <div class="card-title">Certificates <a href="#" onclick="showScreen('certs')">View all →</a></div>
+          <div class="cert-grid">
+            <div class="cert-item">
+              <div class="cert-icon">🏆</div>
+              <div class="cert-name">Foundations</div>
+              <div class="cert-date">Apr 20, 2025</div>
+              <div class="share-pill" onclick="shareModal('Foundations')">Share</div>
+            </div>
+            <div class="cert-item cert-locked">
+              <div class="cert-icon">🔒</div>
+              <div class="cert-name">Excel Mastery</div>
+              <div class="cert-date">In progress</div>
+            </div>
+            <div class="cert-item cert-locked">
+              <div class="cert-icon">🔒</div>
+              <div class="cert-name">SQL</div>
+              <div class="cert-date">Locked</div>
+            </div>
+            <div class="cert-item cert-locked">
+              <div class="cert-icon">🔒</div>
+              <div class="cert-name">Tableau</div>
+              <div class="cert-date">Locked</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LESSON SCREEN ══ -->
+  <div class="screen" id="screen-lesson">
+    <div class="lesson-layout">
+      <!-- left: video + Q&A -->
+      <div>
+        <div class="video-wrap">
+          <iframe id="lesson-video"
+            src="https://www.youtube.com/embed/TqBnq5JvVSU?rel=0&modestbranding=1"
+            title="Day 1 — What is Data & Data Analysis?"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+
+        <div class="lesson-title" id="lesson-title">1.1 — What is Data & Data Analysis?</div>
+        <div class="lesson-meta">
+          <span>📁 Module 1: Foundations</span>
+          <span>⏱ 12 min</span>
+          <span style="color:var(--green);">✓ Free preview</span>
+        </div>
+        <div class="lesson-desc">Start here. This lesson defines what data is, what data analysis means in the real world, and why it matters in everyday life and business. By the end you'll understand the difference between data, information, and insight — and why companies pay analysts to turn one into the other.</div>
+
+        <!-- Q&A -->
+        <div class="qa-section">
+
+          <!-- 1: QUIZ -->
+          <div class="qa-block">
+            <div class="qa-header">
+              <div class="qa-num" style="background:rgba(124,106,255,.15);color:var(--accent);">1</div>
+              <div>
+                <div class="qa-type">Knowledge Check</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:1px;">Answer all questions · Pass mark: 80%</div>
+              </div>
+            </div>
+            <div class="qa-body">
+              <!-- Q1 -->
+              <div class="quiz-q">1. Which of the following best describes the role of a data analyst?</div>
+              <div class="quiz-options" id="qz1">
+                <div class="quiz-opt" onclick="selectOpt(this,'qz1')"><div class="quiz-opt-dot"></div>Writing code to build mobile apps</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz1')"><div class="quiz-opt-dot"></div>Collecting, cleaning and interpreting data to help businesses make decisions</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz1')"><div class="quiz-opt-dot"></div>Designing user interfaces and experiences</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz1')"><div class="quiz-opt-dot"></div>Managing servers and cloud infrastructure</div>
+              </div>
+              <!-- Q2 -->
+              <div class="quiz-q">2. What is the difference between data and information?</div>
+              <div class="quiz-options" id="qz2">
+                <div class="quiz-opt" onclick="selectOpt(this,'qz2')"><div class="quiz-opt-dot"></div>They mean exactly the same thing</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz2')"><div class="quiz-opt-dot"></div>Data is raw facts and figures; information is data that has been processed into something meaningful</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz2')"><div class="quiz-opt-dot"></div>Information is always numerical; data is always text</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz2')"><div class="quiz-opt-dot"></div>Data is only used by scientists; information is for businesses</div>
+              </div>
+              <!-- Q3 -->
+              <div class="quiz-q">3. Which of these is an example of quantitative data?</div>
+              <div class="quiz-options" id="qz3">
+                <div class="quiz-opt" onclick="selectOpt(this,'qz3')"><div class="quiz-opt-dot"></div>A customer's name</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz3')"><div class="quiz-opt-dot"></div>A product's colour</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz3')"><div class="quiz-opt-dot"></div>Monthly sales figures</div>
+                <div class="quiz-opt" onclick="selectOpt(this,'qz3')"><div class="quiz-opt-dot"></div>A customer review comment</div>
+              </div>
+              <button class="quiz-submit" id="quiz-btn" onclick="submitQuiz()" disabled>Submit answers</button>
+              <div class="quiz-result" id="quiz-result"></div>
+            </div>
+          </div>
+
+          <!-- 2: REFLECTION -->
+          <div class="qa-block">
+            <div class="qa-header">
+              <div class="qa-num" style="background:rgba(240,180,41,.12);color:var(--gold);">2</div>
+              <div>
+                <div class="qa-type">Reflection Prompt</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:1px;">Private — only you can see this</div>
+              </div>
+            </div>
+            <div class="qa-body">
+              <div class="reflection-q">Think about your own daily life or your current/previous job. Where do you encounter data without realising it? How could data analysis help you make better decisions in that area?</div>
+              <textarea class="reflection-textarea" id="reflection1" placeholder="Write your thoughts here..."></textarea>
+              <button class="reflection-save" id="ref-save-1" onclick="saveReflection('reflection1','ref-save-1')">Save reflection</button>
+            </div>
+          </div>
+
+          <!-- 3: WHATSAPP -->
+          <div class="qa-block">
+            <div class="qa-header">
+              <div class="qa-num" style="background:rgba(37,211,102,.1);color:#25d366;">3</div>
+              <div>
+                <div class="qa-type">Community Discussion</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:1px;">Post this in the WhatsApp group</div>
+              </div>
+            </div>
+            <div class="qa-body">
+              <div class="wa-prompt">
+                <div class="wa-question">Post in the community: <em>"Before this course, I thought data analysis was about [X]. Now I understand it's really about [Y]. One area in my life where data analysis could help me is [Z]."</em></div>
+                <a class="wa-btn" href="https://wa.me/" target="_blank">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.555 4.122 1.524 5.855L.057 23.944l6.244-1.441A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.886 0-3.655-.493-5.19-1.357l-.371-.213-3.708.856.883-3.601-.234-.381A9.943 9.943 0 012 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+                  Open WhatsApp Community
+                </a>
+                <div class="wa-note">Copy the prompt above, fill in the blanks with your own answer, and paste it in the group. Reading other students' answers is one of the best ways to reinforce what you just learned.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- nav buttons -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;">
+            <button class="btn-sm btn-ghost" disabled>← Previous lesson</button>
+            <button class="btn-sm btn-primary" onclick="nextLesson()">Next lesson →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- right: lesson list -->
+      <div class="lesson-sidebar">
+        <div class="card" style="padding:16px;">
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;padding:0 2px;">Course Lessons</div>
+          <div class="lesson-list">
+            <!-- Module 1 -->
+            <div class="mod-header-row">Module 1 — Foundations</div>
+            <div class="lesson-item active" onclick="loadLesson(1,1,'What is Data & Data Analysis?','TqBnq5JvVSU','12:20')">
+              <div class="li-check done">✓</div>
+              <div class="li-num">1.1</div>
+              <div class="li-title">What is Data & Data Analysis?</div>
+              <div class="li-dur">12:20</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,2,'Career Paths in Data Analysis','dQw4w9WgXcQ','7:40')">
+              <div class="li-check done">✓</div>
+              <div class="li-num">1.2</div>
+              <div class="li-title">Career Paths in Data Analysis</div>
+              <div class="li-dur">7:40</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,3,'The Data Analysis Process','dQw4w9WgXcQ','18:52')">
+              <div class="li-check"></div>
+              <div class="li-num">1.3</div>
+              <div class="li-title">The Data Analysis Process — 6 Key Steps</div>
+              <div class="li-dur">18:52</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,4,'Understanding Data Types','dQw4w9WgXcQ','10:43')">
+              <div class="li-check"></div>
+              <div class="li-num">1.4</div>
+              <div class="li-title">Understanding Data Types</div>
+              <div class="li-dur">10:43</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,5,'Basic Statistics for Analysts','dQw4w9WgXcQ','12:30')">
+              <div class="li-check"></div>
+              <div class="li-num">1.5</div>
+              <div class="li-title">Basic Statistics for Analysts</div>
+              <div class="li-dur">12:30</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,6,'Understanding Business Problems','dQw4w9WgXcQ','8:22')">
+              <div class="li-check"></div>
+              <div class="li-num">1.6</div>
+              <div class="li-title">Understanding Business Problems</div>
+              <div class="li-dur">8:22</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,7,'Mastering Data Cleaning','dQw4w9WgXcQ','10:48')">
+              <div class="li-check"></div>
+              <div class="li-num">1.7</div>
+              <div class="li-title">Mastering Data Cleaning</div>
+              <div class="li-dur">10:48</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,8,'Data Ethics for Beginners','dQw4w9WgXcQ','10:08')">
+              <div class="li-check"></div>
+              <div class="li-num">1.8</div>
+              <div class="li-title">Data Ethics for Beginners</div>
+              <div class="li-dur">10:08</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,9,'Data Visualization Principles','dQw4w9WgXcQ','17:34')">
+              <div class="li-check"></div>
+              <div class="li-num">1.9</div>
+              <div class="li-title">Data Visualization Principles</div>
+              <div class="li-dur">17:34</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(1,10,'Exploring Data Sources','dQw4w9WgXcQ','14:00')">
+              <div class="li-check"></div>
+              <div class="li-num">1.10</div>
+              <div class="li-title">Exploring Data Sources</div>
+              <div class="li-dur">14:00</div>
+            </div>
+            <!-- Module 2 header -->
+            <div class="mod-header-row">Module 2 — Excel Mastery</div>
+            <div class="lesson-item" onclick="loadLesson(2,1,'Introduction to Excel','dQw4w9WgXcQ','18:33')">
+              <div class="li-check"></div>
+              <div class="li-num">2.1</div>
+              <div class="li-title">Introduction to Excel</div>
+              <div class="li-dur">18:33</div>
+            </div>
+            <div class="lesson-item" onclick="loadLesson(2,2,'Excel Data Cleaning Basics','dQw4w9WgXcQ','17:58')">
+              <div class="li-check"></div>
+              <div class="li-num">2.2</div>
+              <div class="li-title">Excel Data Cleaning Basics</div>
+              <div class="li-dur">17:58</div>
+            </div>
+            <!-- locked modules shown as locked -->
+            <div class="mod-header-row">Module 3–7</div>
+            <div class="lesson-item locked">
+              <div class="li-check"></div>
+              <div class="li-num" style="font-size:14px;">🔒</div>
+              <div class="li-title">Locked — complete previous modules</div>
+              <div class="li-dur"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CERTIFICATES SCREEN ══ -->
+  <div class="screen" id="screen-certs">
+    <div style="max-width:700px;">
+      <div class="dash-greeting">
+        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;">My Certificates</h2>
+        <p style="font-size:14px;color:var(--muted2);">Earn a certificate by completing each module with 80%+ on the quiz. Share them publicly to build your professional brand.</p>
+      </div>
+
+      <!-- earned cert -->
+      <div style="background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(34,197,94,.04));border:1px solid var(--green-border);border-radius:var(--radius);padding:28px;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div style="font-size:48px;">🏆</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin-bottom:4px;">Earned · 20 Apr 2025</div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;">Module 1: Data Analytics Foundations</div>
+            <div style="font-size:13px;color:var(--muted2);">Issued by DataWithTosin · Oluwatosin Babalola</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button class="btn-sm btn-primary" onclick="shareModal('Module 1 — Foundations')">Share on LinkedIn</button>
+            <button class="btn-sm btn-ghost">Download PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- locked certs -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;opacity:.45;">
+          <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">Module 2: Excel Mastery</div>
+          <div style="font-size:12px;color:var(--muted);">Complete module quiz with 80%+</div>
+          <div style="margin-top:10px;height:4px;background:var(--surface2);border-radius:999px;"><div style="width:20%;background:var(--accent);height:100%;border-radius:999px;"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:5px;">3 of 15 lessons done</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;opacity:.25;">
+          <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">Module 3: SQL</div>
+          <div style="font-size:12px;color:var(--muted);">Unlock after Module 2</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;opacity:.25;">
+          <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">Module 4: Tableau</div>
+          <div style="font-size:12px;color:var(--muted);">Unlock after Module 3</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;opacity:.25;">
+          <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">Module 5: Power BI</div>
+          <div style="font-size:12px;color:var(--muted);">Unlock after Module 4</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;opacity:.25;">
+          <div style="font-size:28px;margin-bottom:8px;">🔒</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">Module 6: Career Readiness</div>
+          <div style="font-size:12px;color:var(--muted);">Unlock after Module 5</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;opacity:.2;">
+          <div style="font-size:28px;margin-bottom:8px;">🤖</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px;">Module 7: AI Tools</div>
+          <div style="font-size:12px;color:var(--gold);">Coming at launch</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ LEADERBOARD SCREEN ══ -->
+  <div class="screen" id="screen-leaderboard">
+    <div style="max-width:600px;">
+      <div class="dash-greeting">
+        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;">Leaderboard</h2>
+        <p style="font-size:14px;color:var(--muted2);">Points are earned by completing lessons (1 pt), passing quizzes (2 pts), and posting in the community (1 pt). Updated daily.</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;gap:8px;margin-bottom:20px;font-size:11px;color:var(--muted);padding-bottom:12px;border-bottom:1px solid var(--border);">
+          <span style="flex:1;padding-left:56px;">Student</span>
+          <span>Lessons</span>
+          <span style="min-width:60px;text-align:right;">Points</span>
+        </div>
+        <div class="lb-item">
+          <div class="lb-rank gold" style="font-size:18px;">🥇</div>
+          <div class="lb-avatar" style="background:rgba(240,180,41,.15);color:var(--gold);">CK</div>
+          <div style="flex:1;"><div class="lb-name">Chisom K.</div><div style="font-size:11px;color:var(--muted);">Lagos · 18 lessons done</div></div>
+          <div class="lb-score" style="font-size:15px;font-weight:700;color:var(--gold);">52 pts</div>
+        </div>
+        <div class="lb-item">
+          <div class="lb-rank silver" style="font-size:18px;">🥈</div>
+          <div class="lb-avatar" style="background:rgba(148,163,184,.12);color:#94a3b8;">TO</div>
+          <div style="flex:1;"><div class="lb-name">Tunde O.</div><div style="font-size:11px;color:var(--muted);">London · 15 lessons done</div></div>
+          <div class="lb-score" style="font-size:15px;font-weight:700;">47 pts</div>
+        </div>
+        <div class="lb-item">
+          <div class="lb-rank bronze" style="font-size:18px;">🥉</div>
+          <div class="lb-avatar" style="background:rgba(180,83,9,.12);color:#b45309;">FM</div>
+          <div style="flex:1;"><div class="lb-name">Fatima M.</div><div style="font-size:11px;color:var(--muted);">Manchester · 14 lessons done</div></div>
+          <div class="lb-score" style="font-size:15px;font-weight:700;">43 pts</div>
+        </div>
+        <!-- current user highlighted -->
+        <div class="lb-item" style="background:rgba(124,106,255,.07);border-radius:var(--radius-sm);margin:4px -4px;padding:10px 12px;">
+          <div class="lb-rank" style="color:var(--accent);font-size:15px;font-weight:800;">4</div>
+          <div class="lb-avatar" style="background:rgba(124,106,255,.2);color:var(--accent);">AB</div>
+          <div style="flex:1;"><div class="lb-name" style="color:var(--accent);">You — Adaeze B.</div><div style="font-size:11px;color:var(--muted);">Toronto · 10 lessons done</div></div>
+          <div class="lb-score" style="font-size:15px;font-weight:700;color:var(--accent);">38 pts</div>
+        </div>
+        <div class="lb-item">
+          <div class="lb-rank" style="font-size:15px;">5</div>
+          <div class="lb-avatar" style="background:rgba(255,255,255,.06);color:var(--muted);">BI</div>
+          <div style="flex:1;"><div class="lb-name">Bisi I.</div><div style="font-size:11px;color:var(--muted);">Houston · 9 lessons done</div></div>
+          <div class="lb-score">31 pts</div>
+        </div>
+        <div class="lb-item">
+          <div class="lb-rank" style="font-size:15px;">6</div>
+          <div class="lb-avatar" style="background:rgba(255,255,255,.06);color:var(--muted);">KA</div>
+          <div style="flex:1;"><div class="lb-name">Kemi A.</div><div style="font-size:11px;color:var(--muted);">Dublin · 8 lessons done</div></div>
+          <div class="lb-score">27 pts</div>
+        </div>
+        <div style="padding:14px 0 0;text-align:center;font-size:13px;color:var(--muted);">38 students enrolled · <a href="#" style="color:var(--accent);text-decoration:none;">Invite a friend</a></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="share-modal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:32px;max-width:440px;width:90%;text-align:center;">
+    <div style="font-size:48px;margin-bottom:12px;">🏆</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;" id="modal-module-name">Module 1 Complete!</div>
+    <div style="font-size:13px;color:var(--muted2);margin-bottom:24px;line-height:1.65;">Share this milestone publicly. Recruiters and employers notice students who document their learning journey in real time.</div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;font-size:13px;color:var(--muted2);text-align:left;line-height:1.7;" id="modal-copy-text">
+      🎉 Just completed <strong style="color:var(--text);">Module 1: Data Analytics Foundations</strong> on the #90DaysDataAnalytics challenge with @DataWithTosin! Learning what data analysis really means and how to think like an analyst. Day 10 done — 80 more to go! 💪 #DataAnalytics #LearningInPublic #AfricanInTech
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn-sm btn-primary" style="padding:12px;" onclick="copyShareText()">Copy caption</button>
+      <button class="btn-sm btn-ghost" style="padding:12px;" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Screen navigation ──
+const screens = ['dashboard','lesson','certs','leaderboard'];
+const titles = {dashboard:'Dashboard',lesson:'Continue Learning',certs:'My Certificates',leaderboard:'Leaderboard'};
+
+function showScreen(id){
+  screens.forEach(s=>{
+    document.getElementById('screen-'+s).classList.toggle('active', s===id);
+  });
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.remove('active');
+  });
+  document.getElementById('topbar-title').textContent = titles[id]||'';
+  closeSidebar();
+}
+
+// ── Sidebar ──
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ── Quiz ──
+const correctAnswers = {qz1:1, qz2:1, qz3:2}; // 0-indexed correct answers
+
+function selectOpt(el, groupId){
+  document.querySelectorAll('#'+groupId+' .quiz-opt').forEach(o=>{
+    o.classList.remove('selected');
+    o.querySelector('.quiz-opt-dot').classList.remove('filled');
+  });
+  el.classList.add('selected');
+  el.querySelector('.quiz-opt-dot').classList.add('filled');
+  checkAllAnswered();
+}
+
+function checkAllAnswered(){
+  const allAnswered = ['qz1','qz2','qz3'].every(g=>document.querySelector('#'+g+' .selected'));
+  document.getElementById('quiz-btn').disabled = !allAnswered;
+}
+
+function submitQuiz(){
+  let correct = 0;
+  ['qz1','qz2','qz3'].forEach((g,i)=>{
+    const opts = document.querySelectorAll('#'+g+' .quiz-opt');
+    const selected = document.querySelector('#'+g+' .selected');
+    opts.forEach((o,idx)=>{
+      o.onclick = null;
+      if(idx === correctAnswers[g]) o.classList.add('correct');
+    });
+    if(selected){
+      const idx = Array.from(opts).indexOf(selected);
+      if(idx === correctAnswers[g]) correct++;
+      else selected.classList.add('wrong');
+    }
+  });
+  const pct = Math.round((correct/3)*100);
+  const result = document.getElementById('quiz-result');
+  result.classList.add('show');
+  if(pct >= 80){
+    result.classList.add('pass');
+    result.innerHTML = '✓ You scored '+pct+'% — well done! You can move on to the next lesson.';
+  } else {
+    result.classList.add('fail');
+    result.innerHTML = '✗ You scored '+pct+'%. Review the lesson and try again — you need 80% to continue.';
+  }
+  document.getElementById('quiz-btn').disabled = true;
+}
+
+// ── Reflection ──
+function saveReflection(textareaId, btnId){
+  const val = document.getElementById(textareaId).value.trim();
+  if(!val) return;
+  const btn = document.getElementById(btnId);
+  btn.textContent = 'Saved ✓';
+  btn.classList.add('saved');
+  setTimeout(()=>{ btn.textContent='Save reflection'; btn.classList.remove('saved'); }, 2500);
+}
+
+// ── Lesson loading ──
+function loadLesson(mod, num, title, videoId, dur){
+  document.getElementById('lesson-video').src = 'https://www.youtube.com/embed/'+videoId+'?rel=0&modestbranding=1';
+  document.getElementById('lesson-title').textContent = mod+'.'+num+' — '+title;
+  document.querySelectorAll('.lesson-item').forEach(el=>el.classList.remove('active'));
+  showScreen('lesson');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function nextLesson(){
+  alert('In the live portal, this would load the next lesson automatically and track your progress.');
+}
+
+// ── Share modal ──
+function shareModal(moduleName){
+  document.getElementById('modal-module-name').textContent = moduleName+' Complete!';
+  document.getElementById('share-modal').style.display='flex';
+}
+function closeModal(){
+  document.getElementById('share-modal').style.display='none';
+}
+function copyShareText(){
+  const text = document.getElementById('modal-copy-text').innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    setTimeout(()=>btn.textContent='Copy caption', 2000);
+  });
+}
+document.getElementById('share-modal').addEventListener('click', function(e){
+  if(e.target===this) closeModal();
+});
+</script>
+</body>
+</html>
